@@ -35,10 +35,15 @@ public class Sequencer : MonoBehaviour {
 	}
 
 	void Update () {
-		if (!metro.isRunning() && someTrackState(TrackState.ARMED)) {
+		if (!metro.isRunning() && someTrackState(TrackState.ON)) {
 			print ("Metro is starting because I pressed a button");
 			foreach (Track t in tracks) {
 				t.source.Play();
+				if (t.state != TrackState.ON) {
+					t.source.mute = true;
+				} else {
+					t.source.mute = false;
+				}
 			}
 			metro.go();
 		}
@@ -68,8 +73,13 @@ public class Sequencer : MonoBehaviour {
 		int buttonHeight = 20;
 		for (int i = 0; i < this.numberOfTracks; ++i) {
 			if (GUI.Button(new Rect(buttonWidth * i, Screen.height - buttonHeight, buttonWidth, buttonHeight), tracks[i].name)) {
-				tracks[i].state = TrackState.ARMED;
-				print (tracks[i].name + " armed!");
+				if (!metro.isRunning()) {
+					tracks[i].state = TrackState.ON;
+					print (tracks[i].name + " straight to GO!");
+				} else {
+					tracks[i].state = TrackState.ARMED;
+					print (tracks[i].name + " armed! because metro running = " + metro.isRunning());
+				}
 			}
 		}
 		// State indicators for each track
