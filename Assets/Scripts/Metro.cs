@@ -67,4 +67,8 @@ public class Metro : MonoBehaviour {
 		return isBeatOne;
 	}
 
+	// Getter function to see if metronome is running
+	public bool isRunning() {
+		return running;
+	}
 }
