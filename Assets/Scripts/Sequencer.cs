@@ -11,7 +11,7 @@ public class Sequencer : MonoBehaviour {
 		public string name;
 	}
 
-	private Metro metro;
+	public Metro metro;
 	private Track[] tracks;
 	private int numberOfTracks = 4;
 
@@ -26,7 +26,6 @@ public class Sequencer : MonoBehaviour {
 		AudioSource[] sources = new AudioSource[4] {track0, track1, track2, track3};
 		string[] trackNames = new string[4] {track0Name, track1Name, track2Name, track3Name};
 		// Instantiate member variables
-		metro = new Metro(120.0F, 4, 4);
 		tracks = new Track[4];
 		for (int i = 0; i < numberOfTracks; ++i) {
 			tracks[i].source = sources[i];
@@ -36,15 +35,58 @@ public class Sequencer : MonoBehaviour {
 	}
 
 	void Update () {
-		// Update button colors
+		if (!metro.isRunning() && someTrackState(TrackState.ARMED)) {
+			print ("Metro is starting because I pressed a button");
+			foreach (Track t in tracks) {
+				t.source.Play();
+			}
+			metro.go();
+		}
 		// Update track states on metronome's new measures
 		if (metro.isNewMeasure()) {
-			
+			print ("Sequencer sees new measure");
+			for (int i = 0; i < numberOfTracks; ++i) {
+				if (tracks[i].state == TrackState.ARMED) {
+					if (tracks[i].source.mute) {
+						tracks[i].state = TrackState.ON;
+						tracks[i].source.mute = false;
+					} else {
+						tracks[i].state = TrackState.OFF;
+						tracks[i].source.mute = true;
+					}
+				}
+			}
+			if (!someTrackState(TrackState.ON) && !someTrackState(TrackState.ARMED)) {
+				metro.stop();
+			}
 		}
 	}
 	
 	void OnGUI() {
-		// Need to display buttons and play indicators
+		// Buttons to trigger each track
+		int buttonWidth = 75;
+		int buttonHeight = 20;
+		for (int i = 0; i < this.numberOfTracks; ++i) {
+			if (GUI.Button(new Rect(buttonWidth * i, Screen.height - buttonHeight, buttonWidth, buttonHeight), tracks[i].name)) {
+				tracks[i].state = TrackState.ARMED;
+				print (tracks[i].name + " armed!");
+			}
+		}
+		// State indicators for each track
+		for (int i = 0; i < this.numberOfTracks; ++i) {
+			switch (tracks[i].state) {
+			case TrackState.ON:
+				GUI.backgroundColor = Color.green;
+				break;
+			case TrackState.OFF:
+				GUI.backgroundColor = Color.red;
+				break;
+			case TrackState.ARMED:
+				GUI.backgroundColor = Color.yellow;
+				break;
+			}
+			GUI.Button(new Rect(buttonWidth * i, Screen.height - buttonHeight * 2, buttonWidth, buttonHeight), "Test");
+		}
 	}
 
 //	private void play() {
@@ -75,9 +117,9 @@ public class Sequencer : MonoBehaviour {
 
 	// Returns a true if there are no tracks currently running. If this is so,
 	// then the sequencer should stop the metronome, essentially restarting the song
-	private bool noTracksRunning() {
+	private bool someTrackState(TrackState state) {
 		foreach (Track t in tracks) {
-			if (t.state != TrackState.OFF) {
+			if (t.state == state) {
 				return true;
 			}
 		}

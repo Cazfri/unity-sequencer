@@ -50,6 +50,11 @@ public class Metro : MonoBehaviour {
 
 	// Starts the metronome
 	public void go() {
+		print ("metro go() called");
+		if (this.running) {
+			print ("metro is already running, returning");
+			return;
+		}
 		if (timeBot != 4) {
 			Debug.LogWarning("Warning: Metro currently does not support time signatures other than X/4");
 		}
@@ -59,11 +64,16 @@ public class Metro : MonoBehaviour {
 
 	// Stops the metronome
 	public void stop() {
+		if (!this.running)
+			return;
 		this.running = false;
+		this.isBeatOne = false;
 	}
 
 	// Getter function to see when metronome has reached a new measure
 	public bool isNewMeasure() {
+		//print ("Metro indicates a new measure, dsptime = " + AudioSettings.dspTime);
+		//print ("timetop = " + this.timeTop);
 		return isBeatOne;
 	}
 
