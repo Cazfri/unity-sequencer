@@ -1,4 +1,4 @@
-# unity-sequencer
+# Unity Music Sequencer
 ## What is this?
 This is [music sequencer](https://en.wikipedia.org/wiki/Music_sequencer) in Unity, similar to that of [Ableton Live's Session View](https://www.ableton.com/en/help/article/getting-started-5-working-session-view/). You can play a song by starting and stopping different instruments with on-screen buttons. Pressing an instrument's button will not start playing it, rather the track will becoming "armed". Armed tracks will start or stop playing at the beginning of measure.
 
