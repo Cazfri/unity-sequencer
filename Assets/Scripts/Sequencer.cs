@@ -17,7 +17,7 @@ public class Sequencer : MonoBehaviour {
 
 	// Hard-coding the 4 AudioSources and names isn't scalable, but I'm unsure
 	// how I would create the AudioSources at runtime. I may need to look into
-	// 3rd party plugins or assets
+	// 3rd party plugins or assets.
 	public AudioSource track0, track1, track2, track3;
 	public string track0Name, track1Name, track2Name, track3Name;
 	
@@ -34,9 +34,14 @@ public class Sequencer : MonoBehaviour {
 		}
 	}
 
+	/*
+	 * Update() changes track states from armed to either on or off at the beginning of a
+	 * measure.
+	 */ 
 	void Update () {
+		// Clicking a track button when no tracks are playing turns the track on rather than
+		// arming it
 		if (!metro.isRunning() && someTrackState(TrackState.ON)) {
-			print ("Metro is starting because I pressed a button");
 			foreach (Track t in tracks) {
 				t.source.Play();
 				if (t.state != TrackState.ON) {
@@ -47,9 +52,8 @@ public class Sequencer : MonoBehaviour {
 			}
 			metro.go();
 		}
-		// Update track states on metronome's new measures
+		// Update track states if there is a new measure, turning armed tracks on or off.
 		if (metro.isNewMeasure()) {
-			print ("Sequencer sees new measure");
 			for (int i = 0; i < numberOfTracks; ++i) {
 				if (tracks[i].state == TrackState.ARMED) {
 					if (tracks[i].source.mute) {
@@ -66,23 +70,27 @@ public class Sequencer : MonoBehaviour {
 			}
 		}
 	}
-	
+
+	/*
+	 * OnGUI() is used to draw the buttons and track state indicators. It uses the Unity GUI
+	 * as the user view and controller, but should be rewritten for other uses, such as triggering
+	 * animations when a track is running.
+	 */
 	void OnGUI() {
-		// Buttons to trigger each track
+		// Draw buttons to trigger each track.
 		int buttonWidth = 75;
 		int buttonHeight = 20;
 		for (int i = 0; i < this.numberOfTracks; ++i) {
 			if (GUI.Button(new Rect(buttonWidth * i, Screen.height - buttonHeight, buttonWidth, buttonHeight), tracks[i].name)) {
+				// The first track to be started turns right on instead of being armed.
 				if (!metro.isRunning()) {
 					tracks[i].state = TrackState.ON;
-					print (tracks[i].name + " straight to GO!");
 				} else {
 					tracks[i].state = TrackState.ARMED;
-					print (tracks[i].name + " armed! because metro running = " + metro.isRunning());
 				}
 			}
 		}
-		// State indicators for each track
+		// Draw state indicators for each track.
 		for (int i = 0; i < this.numberOfTracks; ++i) {
 			switch (tracks[i].state) {
 			case TrackState.ON:
@@ -99,23 +107,11 @@ public class Sequencer : MonoBehaviour {
 		}
 	}
 
-//	private void play() {
-//		if (!clipsAreLoaded()) {
-//			Debug.LogWarning ("Warning: Sequencer cannot play clips because they are not all loaded");
-//			return;
-//		}
-//		metro.go();
-//	}
-
-//	private void stop() {
-//		metro.stop();
-//		foreach (Track t in tracks) {
-//			t.source.mute = true;
-//			t.state = Sequencer.TrackState.OFF;
-//			t.source.Play();
-//		}
-//	}
-	
+	/*
+	 * Returns true if all clips are loaded, used to make sure that the metronome doesn't
+	 * start if the audio files aren't loaded. Not neccessarily needed if audio is loaded
+	 * before the scene starts.
+	 */
 	private bool clipsAreLoaded() {
 		foreach (Track t in tracks) {
 			if (t.source.clip.loadState != AudioDataLoadState.Loaded) {
@@ -126,7 +122,7 @@ public class Sequencer : MonoBehaviour {
 	}
 
 	// Returns a true if there are no tracks currently running. If this is so,
-	// then the sequencer should stop the metronome, essentially restarting the song
+	// then the sequencer should stop the metronome, essentially restarting the song.
 	private bool someTrackState(TrackState state) {
 		foreach (Track t in tracks) {
 			if (t.state == state) {

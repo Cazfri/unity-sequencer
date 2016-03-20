@@ -1,10 +1,22 @@
 # unity-sequencer
 ## What is this?
-This is [music sequencer](https://en.wikipedia.org/wiki/Music_sequencer) in Unity, similar to that of [Ableton Live's Session View](https://www.ableton.com/en/help/article/getting-started-5-working-session-view/). Load in a song's audio tracks to AudioSource components. Pressing one of the buttons will arm a track, and the track will begin playing on the first beat of a measure. To stop playing a track, arm it and it will stop playing on the first beat of a measure.
+This is [music sequencer](https://en.wikipedia.org/wiki/Music_sequencer) in Unity, similar to that of [Ableton Live's Session View](https://www.ableton.com/en/help/article/getting-started-5-working-session-view/). You can play a song by starting and stopping different instruments with on-screen buttons. Pressing an instrument's button will not start playing it, rather the track will becoming "armed". Armed tracks will start or stop playing at the beginning of measure.
+
+## Running the sequencer
+If the scene throws errors, you may need to reattach the audio files and references. Follow these steps if the scene won't work.
+ - Locate the SequencerObject GameObject (the sphere in the main scene). Drag the 4 audio files in the /Assets/audio director into the AudioSource components' AudoClip field.
+ - Attached to the SequencerObject is a Metro script. Set the bpm to 120.0, and the TimeTop and TimeBottom values to 4.
+ - Attached to the SequencerObject is a Sequencer script. Drag the SequencerObject's Metro component to the Seqencer's "Metro" field . Drag the AudioSource components onto the "Track <0-3>" fields. Then, name the tracks in the "Track <0-3> Name" fields according to the audio files loaded into the AudioSources.
+ - If you have any other questions, feel free to contact me at nmartinr@umich.edu.
 
 ## Known issues:
-None at the moment :)
+None at the moment.
 
 ## Future goals:
 - Adapt Metronome current beat equation (see Metro.Update()) to account for time signatures other than X/4
 - Change how Sequencer tracks' AudioSources are instantiated so that they can be created at runtime. May require 3rd party plugins.
+- Make it so pressing a track's button while armed de-arms the track.
+    - This is so that if a user accidentally arms a track, they can de-arm it.
+
+## Contact
+If you have any questions, feel free to email me at nmartinr@umich.edu.
